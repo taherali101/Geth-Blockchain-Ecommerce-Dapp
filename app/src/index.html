@@ -30,18 +30,35 @@
     <br />
     <br />
     <div class="table-responsive" >
+<h3>User Item Table</h3>
       <table class="table table-bordered">
         <thead>
           <tr>
             <th>Price</th>
             <th>Product</th>
-            <th>Transfer amount</th>
+            <th>Add to market Place</th>
           </tr>
         </thead>
         <tbody id="candidate-rows"></tbody>
       </table>
     </div>
- <button onclick="App.loaddata()" class="btn btn-primary">Create</button>
+ <button onclick="App.loaddata()" class="btn btn-primary">Load Table</button>
+
+ <br><br>
+   <div class="table-responsive" >
+<h3>Market Place Item Table</h3>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Price</th>
+            <th>Product</th>
+            <th>Purchase item</th>
+          </tr>
+        </thead>
+        <tbody id="marketplace-rows"></tbody>
+      </table>
+    </div>
+ <button onclick="App.marketplaceList()" class="btn btn-primary">Load Table</button>
     <p id="status"></p>
     <p>
       <strong>Hint:</strong> open the browser developer console to view any

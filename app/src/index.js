@@ -12,21 +12,19 @@ const App = {
       this.itemManager = new web3.eth.Contract(
         ItemManager.abi,
         ItemManager.networks[networkId] &&
-          ItemManager.networks[networkId].address
+          ItemManager.networks[networkId].address,
       )
       // this.wsitemManager = new wsWeb3.eth.Contract(
       //   ItemManager.abi,
       //   ItemManager.networks[networkId] && ItemManager.networks[networkId].address,
-      // );
-      this.item = new web3.eth.Contract(
-        Item.abi,
-        Item.networks[this.networkId] && Item.networks[this.networkId].address
-      )
+      // // );
+      // this.item = new web3.eth.Contract(
+      //   Item.abi,
+      //   Item.networks[this.networkId] && Item.networks[this.networkId].address
+      // )
 
       // get accounts
       this.accounts = await web3.eth.getAccounts()
-     
-
     } catch (error) {
       console.error('Could not connect to contract or chain.')
     }
@@ -39,49 +37,107 @@ const App = {
     let result = await this.itemManager.methods
       .createItem(product, amount)
       .send({ from: this.accounts[0] })
-       console.log(this.accounts[0])
-    let itemNM, _price
-    let itemArr = []
-    itemNM = result.events.SupplyChainStep.returnValues.itemName
-    _price = result.events.SupplyChainStep.returnValues.price
-    console.log('Create item event submitted', result)
-    console.log(itemNM, _price, itemArr)
+     
+      this.loaddata();
+  },
 
-    itemArr.push({ itemName: itemNM, Price: _price })
-
-    console.log('array', itemArr)
-    console.log(itemArr[0]['itemName'])
-    console.log(itemArr[0]['Price'])
-
-    for (var i = 0; i < itemArr.length; i++) {
-      var tablebody = document.getElementById('candidate-rows')
+  loaddata: async function () {
+    let inventory = await this.itemManager.methods
+      .getItemList()
+      .call({ from: this.accounts[0] })
+    // console.log(inventory[0]._itemName);
+    // console.log(inventory[0]._priceInWei);
+    console.log(inventory)
+    // console.log(inventory.length)
+    var tablebody = document.getElementById('candidate-rows')
+    tablebody.innerHTML = ''
+    for (var i = 0; i < inventory.length; i++) {
       var tr = document.createElement('TR')
       var td = document.createElement('TD')
       var td1 = document.createElement('TD')
       var td2 = document.createElement('TD')
 
-      td.width = '75'
-      td.appendChild(document.createTextNode(itemArr[i]['Price']))
-      td1.appendChild(document.createTextNode(itemArr[i]['itemName']))
+      td.width = '33'
+      td1.width = '33'
+      td2.width = '33'
+        
+      td.appendChild(document.createTextNode(inventory[i]._priceInWei))
+      td1.appendChild(document.createTextNode(inventory[i]._itemName))
       var button = document.createElement('button')
-      button.innerHTML = 'Transfer'
-      button.onclick = this.transferuser   
+      button.innerHTML = 'Add'
+      button.onclick = this.AddtoMarketPlace(
+        inventory[i]._index,
+        inventory[i]._owner
+      )
       td2.appendChild(button)
       tr.appendChild(td)
       tr.appendChild(td1)
       tr.appendChild(td2)
-
       tablebody.appendChild(tr)
     }
   },
 
-  transferuser: function () {
+  AddtoMarketPlace: function (_index, _owner) {
     console.log('hello')
+    let self = this
+
+    return async function () {
+    
+      console.log(_owner,"owner");
+      console.log(_index,"index");
+      // console.log(self.itemManager)
+      let marketPlace = await self.itemManager.methods
+        .addTomarketPlace(_index, _owner)
+        .send({ from: self.accounts[0] })
+          self.loaddata();
+      self.getMarketplaceList();
+    }
   },
 
-  loaddata: function(){
-   this.itemManager.methods.getItemList().call({from : this.accounts[0]}).then(console.log);
+  getMarketplaceList: async function () {
+    console.log('hi')
+
+    let results = await this.itemManager.methods
+      .marketPlaceList()
+      .call({ from: this.accounts[0] })
+
+console.log(results)
+
+    // let itemNM, _price
+    //   itemNM = results.events.addtoMarketplace.returnValues.itemName
+    //   _price =  results.events.addtoMarketplace.returnValues.price
+    //   console.log(_price)
+    //   console.log(itemNM)
+      let tablebody = document.getElementById('marketplace-rows')
+      tablebody.innerHTML = ''
+      for(var i=0;i<results.length;i++)
+      {
+        let tr = document.createElement('TR')
+        let td = document.createElement('TD')
+        let td1 = document.createElement('TD')
+        let td2 = document.createElement('TD')
+
+        td.width = '33'
+        td1.width = '33'
+        td2.width = '33'
+        
+        td.appendChild(document.createTextNode(results[i]._priceInWei))
+        td1.appendChild(document.createTextNode(results[i]._itemName))
+        let button = document.createElement('button')
+        button.innerHTML = 'Purchase'
+        button.onclick = this.purchase();
+        td2.appendChild(button)
+        tr.appendChild(td)
+        tr.appendChild(td1)
+        tr.appendChild(td2)
+        tablebody.appendChild(tr)
+      }
+  },
+
+  purchase:function(){
+    console.log("In purchase");
   }
+
 }
 
 window.App = App
