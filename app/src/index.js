@@ -1,6 +1,6 @@
 import Web3 from 'web3'
 import ItemManager from '../../build/contracts/ItemManager.json'
-import Item from '../../build/contracts/Item.json'
+// import Item from '../../build/contracts/Item.json'
 
 const App = {
   start: async function () {
@@ -101,13 +101,8 @@ const App = {
       .marketPlaceList()
       .call({ from: this.accounts[0] })
 
-console.log(results)
+      console.log(results)
 
-    // let itemNM, _price
-    //   itemNM = results.events.addtoMarketplace.returnValues.itemName
-    //   _price =  results.events.addtoMarketplace.returnValues.price
-    //   console.log(_price)
-    //   console.log(itemNM)
       let tablebody = document.getElementById('marketplace-rows')
       tablebody.innerHTML = ''
       for(var i=0;i<results.length;i++)
@@ -120,12 +115,22 @@ console.log(results)
         td.width = '33'
         td1.width = '33'
         td2.width = '33'
-        
+        let account = this.accounts[0]
         td.appendChild(document.createTextNode(results[i]._priceInWei))
         td1.appendChild(document.createTextNode(results[i]._itemName))
         let button = document.createElement('button')
         button.innerHTML = 'Purchase'
-        button.onclick = this.purchase();
+       if (account === results[i]._owner){
+         button.disabled = true;
+       }
+       else
+       {
+        button.onclick = this.purchase(
+          results[i]._index,
+          results[i]._owner,
+          results[i]._priceInWei
+        );
+        }
         td2.appendChild(button)
         tr.appendChild(td)
         tr.appendChild(td1)
@@ -134,10 +139,21 @@ console.log(results)
       }
   },
 
-  purchase:function(){
-    console.log("In purchase");
-  }
+  purchase:function(_index,_owner,price){
+      let self=this;
+      return async function(){
+        console.log(_index,"_index")
+        console.log(_owner,"_owner")
+        console.log(price)
+        let result = await self.itemManager.methods
+      .purchaseItem(_index,_owner)
+      .send({ from: self.accounts[0] ,value:1000000000000000000000000000})
 
+      console.log(result)
+
+      
+      }
+  }
 }
 
 window.App = App

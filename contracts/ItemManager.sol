@@ -15,6 +15,7 @@ contract ItemManager {
     
     event SupplyChainStep(uint _itemIndex, string itemName, uint price, address _owner);
     event addtoMarketplace(string itemName, uint price, address _owner);
+    event purchase(S_Item data,uint price );
     S_Item[] public storeData;  
 
     
@@ -62,20 +63,28 @@ contract ItemManager {
             return storeData;
     }
     
-    function purchaseItem(uint _itemIndex, address payable _itemOwner) public{
-        
-        (inventory[msg.sender]).push(inventory[_itemOwner][_itemIndex]);
-        
-        // delete in gas efficient manner
-        uint lastItemIndex = (inventory[_itemOwner]).length - 1;
-        inventory[_itemOwner][_itemIndex] = inventory[_itemOwner][lastItemIndex];
-        (inventory[_itemOwner]).pop();
+    function purchaseItem(uint _itemIndex, address payable _itemOwner) public payable{
+        S_Item memory _data = storeData[_itemIndex];
+         _data._index =  (inventory[msg.sender]).length;
+        _data._owner = msg.sender;
+    //    uint _price = _data._priceInWei;
+        (inventory[msg.sender]).push(_data);
+   
+         // delete in gas efficient manner
+
+        uint lastItemIndex = storeData.length - 1;
+        storeData[_itemIndex] = storeData[lastItemIndex];
+        storeData[_itemIndex]._index = _itemIndex;
+        storeData.pop();
         
         //work on transfer ether from: msg.sender to: _itemOwner
-        uint itemindex = (inventory[msg.sender]).length - 1;
-        uint price = inventory[msg.sender][itemindex]._priceInWei;
-        require(tx.origin == msg.sender);
-        _itemOwner.transfer(price);
+        // uint itemindex = (inventory[msg.sender]).length - 1;
+        // S_Item memory item  = inventory[msg.sender][itemindex];
+        // uint price = item._priceInWei;
+     // require(tx.origin == msg.sender);
+        
+        _itemOwner.transfer(msg.value);
+       //  emit purchase(item,price);
     }
 
 }
