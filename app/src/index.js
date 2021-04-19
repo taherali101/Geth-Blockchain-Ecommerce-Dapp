@@ -121,7 +121,7 @@ const App = {
         let button = document.createElement('button')
         button.innerHTML = 'Purchase'
        if (account === results[i]._owner){
-         button.disabled = true;
+       td2.appendChild(document.createTextNode("This item is Listed by you!"))
        }
        else
        {
@@ -130,8 +130,8 @@ const App = {
           results[i]._owner,
           results[i]._priceInWei
         );
-        }
         td2.appendChild(button)
+        }
         tr.appendChild(td)
         tr.appendChild(td1)
         tr.appendChild(td2)
@@ -147,10 +147,11 @@ const App = {
         console.log(price)
         let result = await self.itemManager.methods
       .purchaseItem(_index,_owner)
-      .send({ from: self.accounts[0] ,value:1000000000000000000000000000})
+      .send({ from: self.accounts[0] ,value:price})
 
       console.log(result)
 
+      this.getMarketplaceList();
       
       }
   }
