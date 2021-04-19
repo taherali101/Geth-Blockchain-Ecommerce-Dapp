@@ -70,13 +70,14 @@ contract ItemManager {
  
         (inventory[msg.sender]).push(_data);
    
-         // delete in gas efficient manner
+        // delete in gas efficient manner
 
         uint lastItemIndex = storeData.length - 1;
         storeData[_itemIndex] = storeData[lastItemIndex];
         storeData[_itemIndex]._index = _itemIndex;
-        storeData.pop();
- 
+         storeData.pop();
+        
+        require(msg.sender.balance<=msg.value);
         _itemOwner.transfer(msg.value);
  
     }
