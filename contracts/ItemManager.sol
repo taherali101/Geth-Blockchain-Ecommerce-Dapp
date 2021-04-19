@@ -77,7 +77,7 @@ contract ItemManager {
         storeData[_itemIndex]._index = _itemIndex;
          storeData.pop();
         
-      //  require(msg.sender.balance<=msg.value);
+       require(address(msg.sender).balance>=msg.value,"you dont have enough funds");
         _itemOwner.transfer(msg.value);
  
     }
