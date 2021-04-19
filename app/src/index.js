@@ -151,8 +151,8 @@ const App = {
 
       console.log(result)
 
-      this.getMarketplaceList();
-      
+      self.getMarketplaceList();
+      self.loaddata();
       }
   }
 }
